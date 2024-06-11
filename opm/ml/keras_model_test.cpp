@@ -12,15 +12,17 @@
 #include "ml_tools/include/test_dense_10x1.h"
 #include "ml_tools/include/test_dense_10x10.h"
 #include "ml_tools/include/test_dense_10x10x10.h"
+#include "ml_tools/include/test_dense_420_32x5_720.h"
 #include "ml_tools/include/test_dense_1x1.h"
 #include "ml_tools/include/test_dense_2x2.h"
 #include "ml_tools/include/test_dense_relu_10.h"
 #include "ml_tools/include/test_dense_tanh_10.h"
+#include "ml_tools/include/test_dense_softmax_10.h"
 #include "ml_tools/include/test_elu_10.h"
 #include "ml_tools/include/test_relu_10.h"
 
 
-#include "ml_tools/include/test_scalingdense_1x1.h"
+// #include "ml_tools/include/test_scalingdense_1x1.h"
 
 
 namespace Opm {
@@ -146,18 +148,23 @@ int main() {
     //     return 1;
     // }
     //
-    // if (!test_dense_1x1<Evaluation>(&load_time, &apply_time)) {
-    //     return 1;
-    // }
-    //
-    // if (!test_dense_10x1<Evaluation>(&load_time, &apply_time)) {
-    //     return 1;
-    // }
-    //
-    // if (!test_dense_2x2<Evaluation>(&load_time, &apply_time)) {
-    //     return 1;
-    // }
-    //
+    if (!test_dense_1x1<Evaluation>(&load_time, &apply_time)) {
+        return 1;
+    }
+    
+    if (!test_dense_10x1<Evaluation>(&load_time, &apply_time)) {
+        return 1;
+    }
+    
+    if (!test_dense_2x2<Evaluation>(&load_time, &apply_time)) {
+        return 1;
+    }
+    if (!test_dense_420_32x5_720<Evaluation>(&load_time, &apply_time)) {
+        return 1;
+    }
+    if (!test_dense_softmax_10<Evaluation>(&load_time, &apply_time)) {
+        return 1;
+    }
     // if (!test_dense_10x10<Evaluation>(&load_time, &apply_time)) {
     //     return 1;
     // }
@@ -206,9 +213,9 @@ int main() {
     //     return 1;
     // }
 
-    if (!test_scalingdense_1x1<Evaluation>(&load_time, &apply_time)) {
-        return 1;
-    }
+    // if (!test_scalingdense_1x1<Evaluation>(&load_time, &apply_time)) {
+    //     return 1;
+    // }
 
     // Run benchmark 5 times and report duration.
     Evaluation total_load_time = 0.0;

@@ -105,49 +105,49 @@ def output_testcase(model, test_x, test_y, name, eps):
 
 
 
-# scaling 1x1
-data: np.ndarray = np.random.uniform(-500, 500, (5, 1))
-feature_ranges: list[tuple[float, float]] = [(0.0, 1.0), (-3.7, 0.0)]
-test_x = np.random.rand(1).astype('f')
-test_y = np.random.rand(1).astype('f')
-data_min = 10.0
-model = Sequential()
-model.add(keras.layers.Input([1]))
-# model.add(Flatten())
-# model.add(Flatten())
-model.add(MinMaxScalerLayer(data_min=0.1,feature_range=(0.0, 1.0)))
-model.add(Dense(1,activation='tanh'))
-model.add(Dense(10,activation='tanh'))
-model.add(Dense(10,activation='tanh'))
-model.add(MinMaxUnScalerLayer(feature_range=(0.0, 1.0)))
-# model.add(Dense(10))
-# model.add(Dense(10))
-# model.add(Dense(10))
-# model.add(MinMaxScalerLayer(feature_range=(0.0, 1.0)))
-# model.add(Flatten())
-# model.add(MinMaxUnScalerLayer())
+# # scaling 1x1
+# data: np.ndarray = np.random.uniform(-500, 500, (5, 1))
+# feature_ranges: list[tuple[float, float]] = [(0.0, 1.0), (-3.7, 0.0)]
+# test_x = np.random.rand(1).astype('f')
+# test_y = np.random.rand(1).astype('f')
+# data_min = 10.0
+# model = Sequential()
+# model.add(keras.layers.Input([1]))
+# # model.add(Flatten())
+# # model.add(Flatten())
+# model.add(MinMaxScalerLayer(data_min=0.1,feature_range=(0.0, 1.0)))
+# model.add(Dense(1,activation='tanh'))
+# model.add(Dense(10,activation='tanh'))
+# model.add(Dense(10,activation='tanh'))
+# model.add(MinMaxUnScalerLayer(feature_range=(0.0, 1.0)))
+# # model.add(Dense(10))
+# # model.add(Dense(10))
+# # model.add(Dense(10))
+# # model.add(MinMaxScalerLayer(feature_range=(0.0, 1.0)))
+# # model.add(Flatten())
+# # model.add(MinMaxUnScalerLayer())
+# # #
+# # # model.get_layer(model.layers[0].name).adapt(data=data)
+# # model.get_layer(model.layers[-1].name).adapt(data=data)
+
+# # model.add(Dense(1, input_dim=1))
+
+# # model: keras.Model = keras.Sequential(
 # #
-# # model.get_layer(model.layers[0].name).adapt(data=data)
-# model.get_layer(model.layers[-1].name).adapt(data=data)
-
-# model.add(Dense(1, input_dim=1))
-
-# model: keras.Model = keras.Sequential(
-#
-#     [
-#
-#         keras.layers.Input([1]),
-#
-#         MinMaxScalerLayer(feature_range=(0.0, 1.0)),
-#
-#         # keras.layers.Dense(1, input_dim=1),
-#
-#         # MinMaxUnScalerLayer(feature_range=(0.0, 1.0)),
-#
-#     ]
-#
-# )
-output_testcase(model, test_x, test_y, 'scalingdense_1x1', '1e-6')
+# #     [
+# #
+# #         keras.layers.Input([1]),
+# #
+# #         MinMaxScalerLayer(feature_range=(0.0, 1.0)),
+# #
+# #         # keras.layers.Dense(1, input_dim=1),
+# #
+# #         # MinMaxUnScalerLayer(feature_range=(0.0, 1.0)),
+# #
+# #     ]
+# #
+# # )
+# output_testcase(model, test_x, test_y, 'scalingdense_1x1', '1e-6')
 
 # Dense 1x1
 test_x = np.arange(10)
@@ -186,6 +186,23 @@ model = Sequential()
 model.add(Dense(10, input_dim=10))
 model.add(Dense(10))
 output_testcase(model, test_x, test_y, 'dense_10x10x10', '1e-6')
+
+# Dense 420, 32*5, 720
+test_x = np.random.rand(1, 420).astype('f')
+test_y = np.random.rand(1, 720).astype('f')
+model = Sequential(
+        [
+            keras.Input(shape=(420)),
+            Dense(32, activation="sigmoid", kernel_initializer="glorot_normal"),
+            Dense(32, activation="sigmoid", kernel_initializer="glorot_normal"),
+            Dense(32, activation="sigmoid", kernel_initializer="glorot_normal"),
+            Dense(32, activation="sigmoid", kernel_initializer="glorot_normal"),
+            Dense(32, activation="sigmoid", kernel_initializer="glorot_normal"),
+            Dense(720),
+        ]
+    )
+
+output_testcase(model, test_x, test_y, 'dense_420_32x5_720', '1e-6')
 
 # Conv 2x2
 test_x = np.random.rand(10, 2, 2,1).astype('f')
@@ -252,6 +269,15 @@ model.add(Dense(10, input_dim=10, activation='tanh'))
 model.add(Dense(10, input_dim=10, activation='tanh'))
 model.add(Dense(10, input_dim=10, activation='tanh'))
 output_testcase(model, test_x, test_y, 'dense_tanh_10', '1e-6')
+
+#  Dense SoftMax
+test_x = np.random.rand(1, 10).astype('f')
+test_y = np.random.rand(1, 10).astype('f')
+model = Sequential()
+model.add(Dense(10, input_dim=10, activation='softmax'))
+model.add(Dense(10, input_dim=10, activation='softmax'))
+model.add(Dense(10, input_dim=10, activation='softmax'))
+output_testcase(model, test_x, test_y, 'dense_softmax_10', '1e-6')
 
 # Conv softplus
 test_x = np.random.rand(10, 2, 2, 1).astype('f')

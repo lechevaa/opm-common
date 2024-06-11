@@ -63,6 +63,9 @@ bool KerasLayerActivation<Evaluation>::LoadLayer(std::ifstream* file) {
     case kSoftPlus:
         activation_type_ = kSoftPlus;
         break;
+    case kSoftMax:
+        activation_type_ = kSoftMax;
+        break;
     case kHardSigmoid:
         activation_type_ = kHardSigmoid;
         break;
@@ -101,6 +104,17 @@ bool KerasLayerActivation<Evaluation>::Apply(Tensor<Evaluation>* in, Tensor<Eval
             out->data_[i] = log(1.0 + exp(out->data_[i]));
         }
         break;
+    case kSoftMax:
+        {
+        Evaluation sumExp = 0.0;
+        for (size_t i = 0; i < out->data_.size(); i++) {
+            sumExp += exp(out->data_[i]);
+        }
+        for (size_t i = 0; i < out->data_.size(); i++) {
+            out->data_[i] = exp(out->data_[i]) / sumExp;
+        }
+        }
+        break;
     case kHardSigmoid:
         for (size_t i = 0; i < out->data_.size(); i++) {
             Evaluation x = (out->data_[i] * 0.2) + 0.5;
@@ -134,7 +148,6 @@ bool KerasLayerActivation<Evaluation>::Apply(Tensor<Evaluation>* in, Tensor<Eval
     default:
         break;
     }
-
     return true;
 }
 

@@ -18,6 +18,7 @@ ACTIVATION_SOFTPLUS = 3
 ACTIVATION_SIGMOID = 4
 ACTIVATION_TANH = 5
 ACTIVATION_HARD_SIGMOID = 6
+ACTIVATION_SOFTMAX = 7
 
 def write_scaling(f):
     # weights = layer.get_weights()[0]
@@ -108,6 +109,8 @@ def export_model(model, filename):
                 f.write(struct.pack('I', ACTIVATION_SIGMOID))
             elif activation == 'hard_sigmoid':
                 f.write(struct.pack('I', ACTIVATION_HARD_SIGMOID))
+            elif activation == 'softmax':
+                f.write(struct.pack('I', ACTIVATION_SOFTMAX))
             else:
                 assert False, "Unsupported activation type: %s" % activation
 
