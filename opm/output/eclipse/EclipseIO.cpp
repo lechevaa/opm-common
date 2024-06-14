@@ -303,7 +303,8 @@ void Opm::EclipseIO::writeTimeStep(const Action::State& action_state,
                                    const bool           isSubstep,
                                    const double         secs_elapsed,
                                    RestartValue         value,
-                                   const bool           write_double)
+                                   const bool           write_double,
+                                   std::optional<int>   time_step)
 {
     if (! this->impl->output_enabled) {
         return;
@@ -332,14 +333,15 @@ void Opm::EclipseIO::writeTimeStep(const Action::State& action_state,
         EclIO::ESmry(outputFile).write_rsm_file();
     }
 
-    // Current implementation will not write restart files for substep, but
-    // there is an unsupported option to the RPTSCHED keyword which will
-    // request restart output from every timestep.
-    if (!isSubstep && schedule.write_rst_file(report_step)) {
+    const auto& ioCfg = es.getIOConfig();
+    const auto ecl_compatible_rst = ioCfg.getEclCompatibleRST();
+    // If --enable-write-all-solutions=true  --enable-opm-rst-file=true we will output every timestep
+    if ( (time_step && !ecl_compatible_rst && *time_step > 0 ) || (!isSubstep && schedule.write_rst_file(report_step))) {
+        int report_index = time_step? (*time_step+1) : report_step;
         EclIO::OutputStream::Restart rstFile {
             EclIO::OutputStream::ResultSet { this->impl->outputDir,
                                              this->impl->baseName },
-            report_step,
+            report_index,
             EclIO::OutputStream::Formatted { ioConfig.getFMTOUT() },
             EclIO::OutputStream::Unified   { ioConfig.getUNIFOUT() }
         };
