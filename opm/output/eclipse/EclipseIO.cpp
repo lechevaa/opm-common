@@ -317,11 +317,12 @@ void Opm::EclipseIO::writeTimeStep(const Action::State& action_state,
 
     const bool final_step { report_step == static_cast<int>(schedule.size()) - 1 };
     const bool is_final_summary = final_step && !isSubstep;
+    int report_index = time_step? (*time_step+1) : report_step;
 
-    if ((report_step > 0) &&
-        this->impl->wantSummaryOutput(report_step, isSubstep, secs_elapsed))
+    if (((report_step > 0) &&
+        this->impl->wantSummaryOutput(report_step, isSubstep, secs_elapsed)) || time_step )
     {
-        this->impl->summary.add_timestep(st, report_step, isSubstep);
+        this->impl->summary.add_timestep(st, report_index, !time_step || isSubstep);
         this->impl->summary.write(is_final_summary);
 
         this->impl->recordSummaryOutput(secs_elapsed);
@@ -333,11 +334,9 @@ void Opm::EclipseIO::writeTimeStep(const Action::State& action_state,
         EclIO::ESmry(outputFile).write_rsm_file();
     }
 
-    const auto& ioCfg = es.getIOConfig();
-    const auto ecl_compatible_rst = ioCfg.getEclCompatibleRST();
     // If --enable-write-all-solutions=true  --enable-opm-rst-file=true we will output every timestep
-    if ( (time_step && !ecl_compatible_rst && *time_step > 0 ) || (!isSubstep && schedule.write_rst_file(report_step))) {
-        int report_index = time_step? (*time_step+1) : report_step;
+    if ( (time_step && *time_step > 0 ) || (!isSubstep && schedule.write_rst_file(report_step))) {
+        
         EclIO::OutputStream::Restart rstFile {
             EclIO::OutputStream::ResultSet { this->impl->outputDir,
                                              this->impl->baseName },
